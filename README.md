@@ -350,5 +350,11 @@ Beberapa peningkatan yang dapat dilakukan:
 
 Project ini dibuat untuk keperluan akademik dalam Mata Kuliah **Jaringan Komputer**.
 
+---
+
+## our honest reaction
+
 <img width="478" height="241" alt="image" src="https://github.com/user-attachments/assets/f9b7271d-0e52-4ce2-9fe0-0ef8b9635b2e" />
+
+---
 
