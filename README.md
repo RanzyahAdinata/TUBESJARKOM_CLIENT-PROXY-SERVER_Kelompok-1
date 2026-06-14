@@ -1,6 +1,6 @@
 # Client–Proxy–Server with TCP/UDP Socket Programming
 
-Implementasi sistem **Client–Proxy–Server berbasis Python Socket Programming** untuk memenuhi Tugas Besar Mata Kuliah Jaringan Komputer Telkom University.
+Implementasi sistem **Client–Proxy–Server berbasis Python Socket Programming** untuk memenuhi Tugas Besar Mata Kuliah Jaringan Komputer.
 
 Sistem terdiri dari tiga komponen utama:
 
@@ -349,3 +349,6 @@ Beberapa peningkatan yang dapat dilakukan:
 ## 📄 Lisensi
 
 Project ini dibuat untuk keperluan akademik dalam Mata Kuliah **Jaringan Komputer**.
+
+<img width="478" height="241" alt="image" src="https://github.com/user-attachments/assets/f9b7271d-0e52-4ce2-9fe0-0ef8b9635b2e" />
+
