@@ -5,10 +5,9 @@ import math
 import csv
 from datetime import datetime
 
-# ============================================================
 # KONFIGURASI
 # Sesuaikan IP di bawah ini sebelum menjalankan
-# ============================================================
+
 PROXY_IP      = '192.168.110.180 '.strip()   # Ganti dengan IP laptop Proxy
 PROXY_PORT    = 8080
 
@@ -18,9 +17,7 @@ WEBSERVER_UDP_PORT = 9000
 TOTAL_PACKETS = 10                 # Jumlah paket UDP (minimal 10 sesuai ketentuan)
 UDP_TIMEOUT   = 1.0               # Timeout per paket: 1 detik (sesuai ketentuan)
 
-# ============================================================
 # MODE TCP — HTTP via Proxy
-# ============================================================
 def mode_tcp(path="/index.html"):
     print(f"{'='*50}")
     print(f"  MODE TCP — HTTP Request via Proxy")
@@ -54,9 +51,7 @@ def mode_tcp(path="/index.html"):
     except Exception as e:
         print(f"[ERROR] Mode TCP gagal: {e}")
 
-# ============================================================
 # MODE UDP — QoS Ping ke Web Server
-# ============================================================
 def mode_udp():
     print(f"{'='*50}")
     print(f"  MODE UDP — QoS Measurement")
@@ -96,9 +91,7 @@ def mode_udp():
     test_duration = time.time() - start_test_time
     client.close()
 
-    # -------------------------------------------------------
     # PERHITUNGAN STATISTIK QoS
-    # -------------------------------------------------------
     print(f"\n{'='*50}")
     print("  HASIL ANALISIS QoS")
     print(f"{'='*50}")
@@ -117,8 +110,7 @@ def mode_udp():
         avg_rtt = sum(rtts) / len(rtts)
         print(f"  RTT          : Min={min_rtt:.2f} ms | Avg={avg_rtt:.2f} ms | Max={max_rtt:.2f} ms")
 
-        # Jitter: deviasi standar selisih RTT berturut-turut σ(RTTi - RTTi-1)
-        # Sesuai rumus ketentuan PDF hal. 13
+        # Jitter adalah deviasi standar selisih RTT berturut-turut σ(RTTi - RTTi-1)
         if len(rtts) > 1:
             deltas      = [rtts[j] - rtts[j-1] for j in range(1, len(rtts))]
             mean_delta  = sum(deltas) / len(deltas)
@@ -134,9 +126,7 @@ def mode_udp():
 
     print(f"{'='*50}")
 
-    # -------------------------------------------------------
     # SIMPAN HASIL KE CSV
-    # -------------------------------------------------------
     filename = f"qos_result_{datetime.now().strftime('%Y%m%d_%H%M%S')}.csv"
     with open(filename, 'w', newline='') as f:
         writer = csv.writer(f)
@@ -145,10 +135,10 @@ def mode_udp():
         rtt_idx = 0
         for i in range(1, TOTAL_PACKETS + 1):
             # Tentukan apakah paket ini received atau lost
-            # (urutan: paket yang received duluan mengisi rtts secara berurutan)
+            # (urutan nya adalah paket yang received duluan mengisi rtts secara berurutan)
             if rtt_idx < len(rtts) and (i - 1 - lost_packets + rtt_idx) < len(rtts):
                 pass
-        # Tulis ulang dengan pendekatan sederhana: received dulu, lost setelahnya
+        # Tulis ulang dengan pendekatan sederhana yaitu, received dulu, lost setelahnya
         for idx, rtt in enumerate(rtts, 1):
             writer.writerow([idx, f"{rtt:.2f}", 'received'])
         for idx in range(len(rtts) + 1, TOTAL_PACKETS + 1):
@@ -168,11 +158,9 @@ def mode_udp():
 
     print(f"\n  Hasil disimpan ke: {filename}")
 
-# ============================================================
 # ENTRY POINT
-# ============================================================
 if __name__ == "__main__":
-    # Validasi argumen: python client.py -mode tcp/udp [path]
+    # Validasi argumen pada python client.py -mode tcp/udp [path]
     if len(sys.argv) < 3 or sys.argv[1] != "-mode":
         print("Cara penggunaan:")
         print("  python client.py -mode tcp [path] → HTTP request via Proxy (contoh: /osi.html)")
