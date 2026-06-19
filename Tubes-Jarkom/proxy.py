@@ -4,10 +4,9 @@ import os
 import time
 from datetime import datetime
 
-# ============================================================
 # KONFIGURASI
 # Sesuaikan IP di bawah ini dengan IP laptop Web Server
-# ============================================================
+
 WEBSERVER_IP   = '192.168.110.239'.strip()   # Ganti dengan IP laptop Web Server
 WEBSERVER_PORT = 8000
 PROXY_HOST     = '192.168.110.180'
@@ -21,9 +20,7 @@ if not os.path.exists(CACHE_DIR):
 
 cache_lock = threading.Lock()
 
-# ============================================================
 # HANDLER PER CLIENT
-# ============================================================
 def handle_client(client_socket, client_addr):
     # Jeda 3 detik untuk simulasi multithreading agar thread aktif menumpuk di log
     time.sleep(3.0)
@@ -41,7 +38,7 @@ def handle_client(client_socket, client_addr):
         request_text = request_data.decode('utf-8', errors='replace')
         first_line   = request_text.split('\r\n')[0]
 
-        # --- Validasi request HTTP (anti malformed request) ---
+        # Validasi request HTTP (anti malformed request)
         parts = first_line.split(' ')
         if len(parts) < 2:
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -59,9 +56,7 @@ def handle_client(client_socket, client_addr):
             safe_filename = "_index.html"
         cache_filepath = os.path.join(CACHE_DIR, safe_filename)
 
-        # -------------------------------------------------------
         # CACHE HIT
-        # -------------------------------------------------------
         with cache_lock:
             cache_exists = os.path.exists(cache_filepath)
 
@@ -72,9 +67,7 @@ def handle_client(client_socket, client_addr):
             status = "HIT"
             client_socket.sendall(response_data)
 
-        # -------------------------------------------------------
         # CACHE MISS — forward ke Web Server
-        # -------------------------------------------------------
         else:
             server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             server_socket.settimeout(WEBSERVER_TIMEOUT)
@@ -92,7 +85,7 @@ def handle_client(client_socket, client_addr):
                     response_data += part
 
             except (socket.timeout, TimeoutError):
-                # --- 504 Gateway Timeout ---
+                # 504 Gateway Timeout
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 print(f"[Proxy] {timestamp} | IP: {client_ip} | URL: {url_path} | 504 Gateway Timeout")
                 error_body = b"<html><body><h1>504 Gateway Timeout</h1></body></html>"
@@ -106,7 +99,7 @@ def handle_client(client_socket, client_addr):
                 return
 
             except ConnectionRefusedError:
-                # --- 504 Gateway Timeout (server tidak bisa dijangkau) ---
+                # 504 Gateway Timeout (server tidak bisa dijangkau)
                 timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
                 print(f"[Proxy] {timestamp} | IP: {client_ip} | URL: {url_path} | 504 Gateway Timeout (Connection Refused)")
                 error_body = b"<html><body><h1>504 Gateway Timeout</h1><p>Web server tidak dapat dijangkau.</p></body></html>"
@@ -129,13 +122,13 @@ def handle_client(client_socket, client_addr):
             status = "MISS"
             client_socket.sendall(response_data)
 
-        # --- Log Wajib: IP client, URL, status cache, waktu respons ---
+        # Log Wajib: IP client, URL, status cache, waktu respons
         latency   = (time.time() - start_time) * 1000
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"[Proxy] {timestamp} | IP: {client_ip} | URL: {url_path} | Cache: {status} | Latency: {latency:.2f} ms")
 
     except Exception as e:
-        # --- 502 Bad Gateway (web server mengembalikan error / error tak terduga) ---
+        # 502 Bad Gateway (web server mengembalikan error / error tak terduga)
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"[Proxy] {timestamp} | IP: {client_ip} | URL: {url_path} | 502 Bad Gateway | Exception: {e}")
         try:
@@ -152,9 +145,7 @@ def handle_client(client_socket, client_addr):
     finally:
         client_socket.close()
 
-# ============================================================
 # MAIN PROXY SERVER
-# ============================================================
 def start_proxy():
     server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
