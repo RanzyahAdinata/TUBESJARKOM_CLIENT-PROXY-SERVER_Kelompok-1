@@ -3,17 +3,13 @@ import threading
 import os
 from datetime import datetime
 
-# ============================================================
 # KONFIGURASI
-# ============================================================
 TCP_HOST = '0.0.0.0'
 TCP_PORT = 8000
 UDP_HOST = '0.0.0.0'
 UDP_PORT = 9000
 
-# ============================================================
 # TCP SERVER (HTTP)
-# ============================================================
 def handle_tcp_request(client_socket, client_addr):
     client_ip = client_addr[0]
     try:
@@ -23,7 +19,7 @@ def handle_tcp_request(client_socket, client_addr):
 
         first_line = request_data.split('\r\n')[0]
 
-        # --- Validasi request HTTP (anti malformed request) ---
+        # Validasi request HTTP (anti malformed request)
         parts = first_line.split(' ')
         if len(parts) < 2:
             timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
@@ -41,7 +37,7 @@ def handle_tcp_request(client_socket, client_addr):
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
 
         if os.path.exists(filepath) and os.path.isfile(filepath):
-            # --- 200 OK ---
+            # 200 OK
             with open(filepath, 'rb') as f:
                 content = f.read()
             status_code = "200 OK"
@@ -53,7 +49,7 @@ def handle_tcp_request(client_socket, client_addr):
             ).encode('utf-8')
             client_socket.sendall(header + content)
         else:
-            # --- 404 Not Found ---
+            # 404 Not Found
             status_code = "404 Not Found"
             error_body = b"<html><body><h1>404 Not Found</h1></body></html>"
             header = (
@@ -64,11 +60,11 @@ def handle_tcp_request(client_socket, client_addr):
             ).encode('utf-8')
             client_socket.sendall(header + error_body)
 
-        # --- Log Wajib: IP client, jalur berkas, timestamp, status code ---
+        # Log Wajib: IP client, jalur berkas, timestamp, status code
         print(f"[TCP] {timestamp} | IP: {client_ip} | Path: {url_path} | Status: {status_code}")
 
     except Exception as e:
-        # --- 500 Internal Server Error ---
+        # 500 Internal Server Error
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print(f"[TCP] {timestamp} | IP: {client_ip} | Status: 500 Internal Server Error | Exception: {e}")
         try:
@@ -104,9 +100,7 @@ def start_tcp_server():
         except Exception as e:
             print(f"[TCP] Accept error: {e}")
 
-# ============================================================
 # UDP SERVER (QoS ECHO)
-# ============================================================
 def start_udp_server():
     server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -122,9 +116,7 @@ def start_udp_server():
         except Exception as e:
             print(f"[UDP] Error: {e}")
 
-# ============================================================
 # MAIN
-# ============================================================
 if __name__ == "__main__":
     print("=" * 50)
     print("  Web Server running on port 8000 (TCP) / 9000 (UDP)")
